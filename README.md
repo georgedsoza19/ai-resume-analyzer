@@ -13,20 +13,23 @@ Assessments use **only** the uploaded resume text and job description. Insights 
 - Side-by-side compare (2–3 analyzed candidates on the same job)
 - Markdown export + print-to-PDF
 - Sample demo mode (works without an API key)
+- Auto-deploy to Vercel on merge/push to `master` via GitHub Actions
 
 ## Stack (free)
 
 - Next.js 15 (App Router) + TypeScript + Tailwind CSS
-- SQLite via Prisma
+- PostgreSQL via [Neon](https://neon.tech) free tier (required for Vercel)
 - Google Gemini (`gemini-2.0-flash`) — free key from [Google AI Studio](https://aistudio.google.com/apikey)
 - `pdf-parse` + `mammoth` for resume text extraction
+- Vercel hosting + GitHub Actions production deploy
 
-## Setup
+## Local setup
 
 ### Requirements
 
 - Node.js 20+
 - npm 10+
+- A Neon (or other Postgres) database URL
 
 ### Install
 
@@ -40,7 +43,7 @@ cp .env.example .env
 Edit `.env`:
 
 ```bash
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DB?sslmode=require"
 GOOGLE_GENERATIVE_AI_API_KEY="your-free-key-here"
 ```
 
@@ -49,7 +52,7 @@ GOOGLE_GENERATIVE_AI_API_KEY="your-free-key-here"
 ### Database
 
 ```bash
-npx prisma migrate dev
+npx prisma migrate deploy
 npm run db:seed
 ```
 
@@ -68,6 +71,58 @@ Open [http://localhost:3000](http://localhost:3000).
 3. Compare them from the candidates list.
 4. Export Markdown or use Print / Save PDF on an evaluation page.
 
+## Vercel auto-deploy (GitHub Actions)
+
+Pushes and merges to `master` trigger [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+### 1. Create a Vercel project
+
+1. Import this GitHub repo in [Vercel](https://vercel.com) (or run `npx vercel` once locally).
+2. Framework preset: **Next.js** (see `vercel.json`).
+3. Build command is already set to run Prisma migrate then `next build`.
+
+### 2. Add Vercel project environment variables
+
+In the Vercel project → **Settings → Environment Variables** (Production):
+
+| Name | Value |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Free Gemini key (optional for demo-only) |
+
+### 3. Add GitHub Actions secrets
+
+In the GitHub repo → **Settings → Secrets and variables → Actions**:
+
+| Secret | How to get it |
+|---|---|
+| `VERCEL_TOKEN` | [Vercel → Account Settings → Tokens](https://vercel.com/account/tokens) |
+| `VERCEL_ORG_ID` | From `.vercel/project.json` after `npx vercel link`, or Vercel team settings |
+| `VERCEL_PROJECT_ID` | From `.vercel/project.json` after `npx vercel link` |
+
+Quick local link (do not commit `.vercel/`):
+
+```bash
+npx vercel link
+cat .vercel/project.json
+```
+
+### 4. Deploy
+
+Merge a PR into `master` (or push to `master`). The **Deploy to Vercel** workflow builds with `vercel build` and deploys prebuilt production artifacts.
+
+You can also run the workflow manually from the Actions tab (`workflow_dispatch`).
+
+### First production seed
+
+After the first successful deploy, seed demo data once (local CLI against the production `DATABASE_URL`, or temporary one-off):
+
+```bash
+DATABASE_URL="your-production-neon-url" npm run db:seed
+```
+
+Or use **Load sample data** on the live dashboard (calls `/api/demo/seed`).
+
 ## Scripts
 
 | Script | Purpose |
@@ -75,8 +130,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run dev` | Start local app |
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
+| `npm run db:deploy` | Apply migrations (`prisma migrate deploy`) |
 | `npm run db:seed` | Seed sample job + candidates |
-| `npx prisma studio` | Browse SQLite data |
+| `npx prisma studio` | Browse database data |
 
 ## Validation & errors
 
@@ -87,4 +143,4 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Privacy note
 
-Resumes and job text are sent to Google Gemini when you run live analysis. Demo evaluations are local and do not call the API.
+Resumes and job text are sent to Google Gemini when you run live analysis. Demo evaluations are local DB records and do not call the API until you re-analyze.
