@@ -73,13 +73,18 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Vercel auto-deploy (GitHub Actions)
 
-Pushes and merges to `master` trigger [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+Repo: [georgedsoza19/ai-resume-analyzer](https://github.com/georgedsoza19/ai-resume-analyzer)  
+Vercel project: `ai-resume-analyzer`  
+Production: [https://first-project-ten-rho-78.vercel.app](https://first-project-ten-rho-78.vercel.app) (alias may update after Git connect)
 
-### 1. Create a Vercel project
+Pushes and merges to `master` trigger [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Native Vercel Git deploys also work once the GitHub app is connected.
 
-1. Import this GitHub repo in [Vercel](https://vercel.com) (or run `npx vercel` once locally).
+### 1. Create / link a Vercel project
+
+1. Import this GitHub repo in [Vercel](https://vercel.com) (or run `npx vercel link`).
 2. Framework preset: **Next.js** (see `vercel.json`).
 3. Build command is already set to run Prisma migrate then `next build`.
+4. Connect Git: [Project → Settings → Git](https://vercel.com/geo-projects1/ai-resume-analyzer/settings/git) and install the [Vercel GitHub App](https://github.com/apps/vercel).
 
 ### 2. Add Vercel project environment variables
 
