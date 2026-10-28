@@ -19,7 +19,7 @@ Assessments use **only** the uploaded resume text and job description. Insights 
 
 - Next.js 15 (App Router) + TypeScript + Tailwind CSS
 - PostgreSQL via [Neon](https://neon.tech) free tier (required for Vercel)
-- Google Gemini (`gemini-2.0-flash`) — free key from [Google AI Studio](https://aistudio.google.com/apikey)
+- Google Gemini (`gemini-3.8-flash`) — free key from [Google AI Studio](https://aistudio.google.com/apikey)
 - `unpdf` + `mammoth` for resume text extraction (PDF-safe in Node/Vercel)
 - Vercel hosting + GitHub Actions production deploy
 
