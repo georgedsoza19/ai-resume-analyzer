@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["pdf-parse", "@prisma/client", "prisma"],
+  serverExternalPackages: ["unpdf", "@prisma/client", "prisma"],
 };
 
 export default nextConfig;
