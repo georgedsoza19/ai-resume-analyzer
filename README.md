@@ -1,70 +1,90 @@
-# Getting Started with Create React App
+# Matchline — AI Resume Analyzer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Polished Next.js app for creating job listings, uploading candidate resumes, and generating **evidence-based** match evaluations with Google Gemini’s free API.
 
-## Available Scripts
+Assessments use **only** the uploaded resume text and job description. Insights are **decision support**, not hiring decisions.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Dashboard for jobs and candidates
+- Job create / edit / delete
+- Resume upload (PDF / DOCX) with processing states
+- AI match score, skills, strengths, gaps, and requirements checklist
+- Side-by-side compare (2–3 analyzed candidates on the same job)
+- Markdown export + print-to-PDF
+- Sample demo mode (works without an API key)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Stack (free)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Next.js 15 (App Router) + TypeScript + Tailwind CSS
+- SQLite via Prisma
+- Google Gemini (`gemini-2.0-flash`) — free key from [Google AI Studio](https://aistudio.google.com/apikey)
+- `pdf-parse` + `mammoth` for resume text extraction
 
-### `npm test`
+## Setup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Requirements
 
-### `npm run build`
+- Node.js 20+
+- npm 10+
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Install
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+cp .env.example .env
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Environment
 
-### `npm run eject`
+Edit `.env`:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+DATABASE_URL="file:./dev.db"
+GOOGLE_GENERATIVE_AI_API_KEY="your-free-key-here"
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+`GOOGLE_GENERATIVE_AI_API_KEY` is optional for browsing seeded demo data. It is required for live resume analysis.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Database
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npx prisma migrate dev
+npm run db:seed
+```
 
-## Learn More
+### Run
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run dev
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Open [http://localhost:3000](http://localhost:3000).
 
-### Code Splitting
+## Demo without an API key
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. Run migrate + seed (or use **Load sample data** on the dashboard).
+2. Open the sample **Frontend Engineer** job and candidates **Alex Rivera** / **Jordan Lee**.
+3. Compare them from the candidates list.
+4. Export Markdown or use Print / Save PDF on an evaluation page.
 
-### Analyzing the Bundle Size
+## Scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Start local app |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run db:seed` | Seed sample job + candidates |
+| `npx prisma studio` | Browse SQLite data |
 
-### Making a Progressive Web App
+## Validation & errors
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- Job forms validated with Zod (title, company, description, requirements)
+- Uploads limited to PDF/DOCX, max 5MB, with non-empty extracted text
+- Compare requires 2–3 analyzed candidates on the same job
+- Missing API key, extract failures, and Gemini errors surface clear messages
 
-### Advanced Configuration
+## Privacy note
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Resumes and job text are sent to Google Gemini when you run live analysis. Demo evaluations are local and do not call the API.

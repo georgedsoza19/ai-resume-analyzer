@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id           String      @id @default(cuid())
+  title        String
+  company      String
+  description  String
+  requirements String
+  isSample     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  candidates   Candidate[]
+}
+
+model Candidate {
+  id             String       @id @default(cuid())
+  name           String
+  email          String?
+  resumeFilename String
+  resumeText     String
+  status         String       @default("uploaded") // uploaded | processing | analyzed | failed
+  errorMessage   String?
+  isSample       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  jobId          String
+  job            Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  evaluation     Evaluation?
+}
+
+model Evaluation {
+  id                    String   @id @default(cuid())
+  matchScore            Int
+  summary               String
+  skillsMatched         String // JSON array
+  skillsMissing         String // JSON array
+  experienceNotes       String
+  strengths             String // JSON array
+  gaps                  String // JSON array
+  requirementsChecklist String // JSON array of { requirement, status, evidence }
+  rawJson               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  candidateId           String   @unique
+  candidate             Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
