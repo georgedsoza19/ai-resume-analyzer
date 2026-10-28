@@ -87,8 +87,10 @@ In the Vercel project → **Settings → Environment Variables** (Production):
 
 | Name | Value |
 |---|---|
-| `DATABASE_URL` | Neon Postgres connection string |
+| `DATABASE_URL` | Neon **pooled** connection string |
+| `DATABASE_URL_UNPOOLED` | Neon **direct** connection string (required for Prisma migrate) |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Free Gemini key (optional for demo-only) |
+| `NEON_BRANCH` | Optional; set by `neon deploy` (e.g. `production`) |
 
 ### 3. Add GitHub Actions secrets
 
